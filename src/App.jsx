@@ -33,7 +33,7 @@ function useSparkles(active = true) {
       document.body.appendChild(el)
       setTimeout(() => el.remove(), 2000)
     }
-    const id = setInterval(create, 2000)
+    const id = setInterval(create, 200)
     return () => clearInterval(id)
   }, [active])
 }
