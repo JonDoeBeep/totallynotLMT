@@ -1,6 +1,22 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 
-// Appwrite is globally available via script tag in index.html
+async function initializeAppwrite() {
+    const client = new Client()
+        .setEndpoint('https://sfo.cloud.appwrite.io/v1') // Your API Endpoint
+        .setProject('68bf36dd001f9ef1d5b6'); // Your project ID
+
+    const tablesDB = new TablesDB(client);
+
+    const result = await tablesDB.getRow({
+        databaseId: '68c065810005868a248c',
+        tableId: 'visits',
+        rowId: '68c0660c002eaf43755e',
+    });
+
+    console.log(result);
+}
+
+initializeAppwrite();
 
 function useKonami(onActivate) {
   useEffect(() => {
