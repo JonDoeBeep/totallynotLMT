@@ -4,5 +4,4 @@ node_modules
 .tmp
 .cache
 vite.svg
-/dist
 /.vite
