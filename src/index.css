@@ -1,28 +1,25 @@
 /* Global styles (ported) */
 @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap');
 
-/* Animated background pattern */
+/* Toned down animated background */
 body {
   font-family: 'Comic Neue', 'Comic Sans MS', cursive;
   margin: 0;
   padding: 10px;
   background: 
-    radial-gradient(circle at 25% 25%, #ff00ff 0%, transparent 50%),
-    radial-gradient(circle at 75% 75%, #00ffff 0%, transparent 50%),
-    radial-gradient(circle at 50% 50%, #ffff00 0%, transparent 50%),
-    linear-gradient(45deg, #ff0080 0%, #8000ff 25%, #0080ff 50%, #00ff80 75%, #ff8000 100%);
-  background-size: 200px 200px, 150px 150px, 100px 100px, 400px 400px;
-  animation: bgShift 10s infinite;
+    linear-gradient(45deg, #ff80c0 0%, #80c0ff 25%, #c080ff 50%, #80ffc0 75%, #ffc080 100%);
+  background-size: 8000px 8000px;
+  animation: bgShift 20s infinite ease-in-out;
   color: #000;
   overflow-x: auto;
 }
 
 @keyframes bgShift {
-  0% { background-position: 0% 0%, 100% 100%, 50% 50%, 0% 0%; }
-  25% { background-position: 100% 0%, 0% 100%, 100% 50%, 25% 25%; }
-  50% { background-position: 100% 100%, 0% 0%, 0% 50%, 50% 50%; }
-  75% { background-position: 0% 100%, 100% 0%, 50% 100%, 75% 75%; }
-  100% { background-position: 0% 0%, 100% 100%, 50% 50%, 0% 0%; }
+  0% { background-position: 0% 0%; }
+  25% { background-position: 100% 0%; }
+  50% { background-position: 100% 100%; }
+  75% { background-position: 0% 100%; }
+  100% { background-position: 0% 0%; }
 }
 
 .container {

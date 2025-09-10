@@ -22,7 +22,7 @@ function useSparkles(active = true) {
     if (!active) return
     const create = () => {
       const el = document.createElement('div')
-      el.textContent = '✨'
+      el.textContent = 'large mike'
       el.style.position = 'fixed'
       el.style.left = Math.random() * window.innerWidth + 'px'
       el.style.top = Math.random() * window.innerHeight + 'px'
