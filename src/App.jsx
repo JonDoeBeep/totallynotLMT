@@ -115,22 +115,99 @@ function VisitorCounter() {
 }
 
 function Guestbook() {
-  const [form, setForm] = useState({ name: '', email: '', homepage: '', message: '' })
+  const [form, setForm] = useState({ name: '', email: '', website: '', message: '' })
+  const [entries, setEntries] = useState([])
+  const [loading, setLoading] = useState(false)
+  
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
-  const onReset = () => setForm({ name: '', email: '', homepage: '', message: '' })
-  const onSubmit = (e) => {
+  const onReset = () => setForm({ name: '', email: '', website: '', message: '' })
+  
+  const onSubmit = async (e) => {
     e.preventDefault()
     const { name, message } = form
-    if (name && message) {
-      alert(`tank u, ${name}!\n\n ok bye`)
-      const entries = JSON.parse(localStorage.getItem('guestbookEntries') || '[]')
-      entries.push({ ...form, date: new Date().toLocaleDateString() })
-      localStorage.setItem('guestbookEntries', JSON.stringify(entries))
-      onReset()
-    } else {
+    if (!name || !message) {
       alert('name. message. NOW')
+      return
+    }
+    
+    setLoading(true)
+    try {
+      // Submit to Appwrite TablesDB
+      const endpoint = (import.meta.env.VITE_APPWRITE_ENDPOINT || 'https://sfo.cloud.appwrite.io/v1').replace(/\/$/, '')
+      const projectId = import.meta.env.VITE_APPWRITE_PROJECT_ID || '68bf36dd001f9ef1d5b6'
+      const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID || '68c065810005868a248c'
+      const tableId = 'guestlog' // Your guestbook table
+      
+      const payload = {
+        rowId: 'unique()', // Let Appwrite generate unique ID
+        data: {
+          name: form.name,
+          email: form.email || '',
+          website: form.website || '',
+          message: form.message
+        }
+      }
+      
+      console.log('Guestbook submission payload:', payload)
+      
+      const res = await fetch(`${endpoint}/tablesdb/${databaseId}/tables/${tableId}/rows`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Appwrite-Project': projectId,
+        },
+        body: JSON.stringify(payload),
+      })
+      
+      console.log('Guestbook response status:', res.status)
+      
+      if (!res.ok) {
+        const errorText = await res.text()
+        console.log('Guestbook error response:', errorText)
+        throw new Error(`HTTP ${res.status}: ${errorText}`)
+      }
+      
+      const result = await res.json()
+      console.log('Guestbook success response:', result)
+      
+      alert(`tank u, ${name}!\n\n ok bye`)
+      onReset()
+      loadEntries() // Reload entries after successful submission
+    } catch (e) {
+      console.warn('Guestbook submission failed:', e)
+      alert('failed to submit guestbook entry. try again later!')
+    } finally {
+      setLoading(false)
     }
   }
+  
+  const loadEntries = async () => {
+    try {
+      const endpoint = (import.meta.env.VITE_APPWRITE_ENDPOINT || 'https://sfo.cloud.appwrite.io/v1').replace(/\/$/, '')
+      const projectId = import.meta.env.VITE_APPWRITE_PROJECT_ID || '68bf36dd001f9ef1d5b6'
+      const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID || '68c065810005868a248c'
+      const tableId = 'guestlog'
+      
+      const res = await fetch(`${endpoint}/tablesdb/${databaseId}/tables/${tableId}/rows?limit=10`, {
+        method: 'GET',
+        headers: {
+          'X-Appwrite-Project': projectId,
+        },
+      })
+      
+      if (res.ok) {
+        const data = await res.json()
+        setEntries(data.rows || [])
+      }
+    } catch (e) {
+      console.warn('Failed to load guestbook entries:', e)
+    }
+  }
+  
+  // Load entries on component mount
+  useEffect(() => {
+    loadEntries()
+  }, [])
 
   return (
     <div className="guestbook-section">
@@ -140,7 +217,7 @@ function Guestbook() {
           <tbody>
             <tr>
               <td>name:</td>
-              <td><input name="name" type="text" size={30} value={form.name} onChange={onChange} /></td>
+              <td><input name="name" type="text" size={30} value={form.name} onChange={onChange} required /></td>
             </tr>
             <tr>
               <td>email:</td>
@@ -148,21 +225,35 @@ function Guestbook() {
             </tr>
             <tr>
               <td>wepsite:</td>
-              <td><input name="homepage" type="url" size={30} placeholder="http://" value={form.homepage} onChange={onChange} /></td>
+              <td><input name="website" type="url" size={30} placeholder="http://" value={form.website} onChange={onChange} /></td>
             </tr>
             <tr>
               <td valign="top">message:</td>
-              <td><textarea name="message" rows={4} cols={40} placeholder="mesag" value={form.message} onChange={onChange} /></td>
+              <td><textarea name="message" rows={4} cols={40} placeholder="mesag" value={form.message} onChange={onChange} required /></td>
             </tr>
             <tr>
               <td colSpan={2} align="center">
-                <input type="submit" value="sine" className="submit-button" />
-                <input type="reset" value="clearr" className="reset-button" />
+                <input type="submit" value={loading ? "submitting..." : "sine"} className="submit-button" disabled={loading} />
+                <input type="reset" value="clearr" className="reset-button" disabled={loading} />
               </td>
             </tr>
           </tbody>
         </table>
       </form>
+      
+      {entries.length > 0 && (
+        <div className="guestbook-entries">
+          <h4>recent entries:</h4>
+          {entries.slice(0, 5).map((entry, idx) => (
+            <div key={entry.$id || idx} className="guestbook-entry">
+              <strong>{entry.name}</strong>
+              {entry.website && <span> - <a href={entry.website} target="_blank" rel="noopener noreferrer">{entry.website}</a></span>}
+              <br />
+              <em>{entry.message}</em>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
