@@ -31,7 +31,7 @@ function useSparkles(active = true) {
       el.style.zIndex = '9999'
       el.style.animation = 'sparkleAnimation 2s ease-out forwards'
       document.body.appendChild(el)
-      setTimeout(() => el.remove(), 1000)
+      setTimeout(() => el.remove(), 8000)
     }
     const id = setInterval(create, 750)
     return () => clearInterval(id)
