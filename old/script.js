@@ -1,6 +1,3 @@
-// 90s Website JavaScript - Totally Rad Interactive Features!
-
-// Initialize when page loads
 document.addEventListener('DOMContentLoaded', function() {
     initVisitorCounter();
     initRandomMessages();
@@ -12,31 +9,31 @@ document.addEventListener('DOMContentLoaded', function() {
 // Show a classic 90s welcome alert
 function showWelcomeAlert() {
     setTimeout(function() {
-        alert('Welcome to my AWESOME homepage! \n\nYou are now entering the COOLEST site on the World Wide Web! \n\nDon\'t forget to sign my guestbook! 😎');
+        alert('hi');
     }, 1000);
 }
 
 // Visitor counter functionality
-function initVisitorCounter() {
-    // Simulate a visitor counter
-    const counterElement = document.getElementById('visitor-count');
-    const currentVisitorElement = document.getElementById('current-visitor');
-    
-    if (counterElement && currentVisitorElement) {
-        // Get or create visitor count in localStorage
-        let visitorCount = localStorage.getItem('visitorCount');
-        if (!visitorCount) {
-            visitorCount = 1337; // Start with a classic number
-        } else {
-            visitorCount = parseInt(visitorCount) + 1;
-        }
-        
-        localStorage.setItem('visitorCount', visitorCount);
-        
-        // Animate the counter
-        animateCounter(counterElement, visitorCount);
-        currentVisitorElement.textContent = visitorCount + 1;
-    }
+async function initVisitorCounter() {
+    const client = new Appwrite.Client()
+    client 
+        .setEndpoint('https://sfo.cloud.appwrite.io/v1') 
+        .setProject('68bf36dd001f9ef1d5b6');
+    const account = new Appwrite.Account(client)
+    const tablesDB = new Appwrite.TablesDB(client)
+    const result = await tablesDB.getRow({
+        databaseId: '68c065810005868a248c',
+        tableId: 'visits',
+        rowId: '68c0660c002eaf43755e'
+    });
+
+    let visitCount = parseInt(result.$data.count) || 0;
+    console.log(visitCount);
+    console.log(result);
+    // Animate the counter
+    animateCounter(counterElement, visitCount);
+    currentVisitorElement.textContent = visitCount + 1;
+
 }
 
 // Animate counter digits
