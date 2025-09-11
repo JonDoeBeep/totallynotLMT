@@ -1,4 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
+import { Client, Account } from 'appwrite'
+import AIPage from './pages/AIPage'
+import AuthPage from './pages/AuthPage'
+import RegistrationPage from './pages/RegistrationPage'
+import AccountPage from './pages/AccountPage'
+import FileHostingPage from './pages/FileHostingPage'
+import VerifyEmailPage from './pages/VerifyEmailPage'
 
 function useKonami(onActivate) {
   useEffect(() => {
@@ -295,6 +303,29 @@ function Footer() {
 
 export default function App() {
   const [konamiActive, setKonamiActive] = useState(false)
+  const [user, setUser] = useState(null)
+  const [checkingAuth, setCheckingAuth] = useState(true)
+
+  // Check if user is logged in
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const client = new Client()
+          .setEndpoint(import.meta.env.VITE_APPWRITE_ENDPOINT || 'https://sfo.cloud.appwrite.io/v1')
+          .setProject(import.meta.env.VITE_APPWRITE_PROJECT_ID || '68bf36dd001f9ef1d5b6')
+
+        const account = new Account(client)
+        const currentUser = await account.get()
+        setUser(currentUser)
+      } catch (e) {
+        setUser(null)
+      } finally {
+        setCheckingAuth(false)
+      }
+    }
+
+    checkAuth()
+  }, [])
 
   useEffect(() => {
     const id = setTimeout(() => alert('hi'), 1000)
@@ -345,7 +376,7 @@ export default function App() {
     const id = setInterval(() => {
       const msg = messages[Math.floor(Math.random() * messages.length)]
       const prev = document.title.split(' - ')[1]
-      document.title = `${msg} - ${prev || 'Rad Site'}`
+      document.title = `${msg} - ${prev || 'sigma'}`
       setTimeout(() => { document.title = baseTitle }, 3000)
     }, 15000)
     return () => clearInterval(id)
@@ -365,55 +396,77 @@ export default function App() {
   useSparkles(true)
 
   return (
-    <div className="container">
-      <Header />
-      <main className="main-content">
-        <div className="welcome-section">
-          <h2 className="rainbow-text">rainbow cool</h2>
-          <p>idk what to put here</p>
-        </div>
-
-        <table className="main-table" border="2" cellPadding="10" cellSpacing="5">
-          <tbody>
-            <tr>
-              <td className="sidebar" bgColor="#FF00FF">
-                <h3>links</h3>
-                <ul className="link-list">
-                  <li><a href="#" className="cool-link">idk</a></li>
-                  <li><a href="#" className="cool-link">idk</a></li>
-                  <li><a href="#" className="cool-link">idk</a></li>
-                  <li><a href="#" className="cool-link">idk</a></li>
-                  <li><a href="#" className="cool-link">idk</a></li>
-                </ul>
-                <VisitorCounter />
-              </td>
-              <td className="content-area" bgColor="#00FFFF">
-                <h3 className="section-title">idk section</h3>
-                <div className="news-item">
-                  <h4>uh updtate 1</h4>
-                  <p>fix viewcounter</p>
+    <BrowserRouter>
+      <div className="container">
+        <Header />
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={
+              <>
+                <div className="welcome-section">
+                  <h2 className="rainbow-text">rainbow cool</h2>
+                  <p>idk what to put here</p>
                 </div>
-                <div className="news-item">
-                  <h4>uodat 2</h4>
-                  <p>yeah</p>
-                </div>
-                <h3 className="section-title">about me</h3>
-                <p>thuisis my siyte here is about me:</p>
-                <ul>
-                  <li>i live</li>
-                  <li>i think</li>
-                  <li>i am</li>
-                  <li>i </li>
-                  <li>me</li>
-                </ul>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <Guestbook />
-      </main>
-      <Footer />
-    </div>
+                <table className="main-table" border="2" cellPadding="10" cellSpacing="5">
+                  <tbody>
+                    <tr>
+                      <td className="sidebar" bgColor="#FF00FF">
+                        <h3>links</h3>
+                        <ul className="link-list">
+                          <li><Link to="/ai" className="cool-link">AI</Link></li>
+                          <li><Link to="/auth" className="cool-link">Auth</Link></li>
+                          <li><Link to="/register" className="cool-link">Register</Link></li>
+                          {user && (
+                            <>
+                              <li><Link to="/account" className="cool-link">Account</Link></li>
+                              <li><Link to="/files" className="cool-link">Files</Link></li>
+                            </>
+                          )}
+                          {!user && (
+                            <>
+                              <li><a href="#" className="cool-link">idk</a></li>
+                              <li><a href="#" className="cool-link">idk</a></li>
+                            </>
+                          )}
+                        </ul>
+                        <VisitorCounter />
+                      </td>
+                      <td className="content-area" bgColor="#00FFFF">
+                        <h3 className="section-title">idk section</h3>
+                        <div className="news-item">
+                          <h4>uh updtate 1</h4>
+                          <p>fix viewcounter</p>
+                        </div>
+                        <div className="news-item">
+                          <h4>uodat 2</h4>
+                          <p>yeah</p>
+                        </div>
+                        <h3 className="section-title">about me</h3>
+                        <p>thuisis my siyte here is about me:</p>
+                        <ul>
+                          <li>i live</li>
+                          <li>i think</li>
+                          <li>i am</li>
+                          <li>i </li>
+                          <li>me</li>
+                        </ul>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <Guestbook />
+              </>
+            } />
+            <Route path="/ai" element={<AIPage />} />
+            <Route path="/auth" element={<AuthPage />} />
+            <Route path="/register" element={<RegistrationPage />} />
+            <Route path="/account" element={<AccountPage />} />
+            <Route path="/files" element={<FileHostingPage />} />
+            <Route path="/verify" element={<VerifyEmailPage />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </BrowserRouter>
   )
 }
