@@ -637,8 +637,7 @@ function useRandomPexelsVideo(enabled) {
 
       try {
         const query = pickRandom(PEXELS_VIDEO_QUERIES)
-        const page = 1 + Math.floor(Math.random() * 25)
-        const response = await fetch(`https://api.pexels.com/v1/videos/search?query=${encodeURIComponent(query)}&orientation=landscape&size=small&per_page=20&page=${page}`, {
+        const response = await fetch(`https://api.pexels.com/v1/videos/search?query=${encodeURIComponent(query)}&orientation=landscape&size=small&per_page=40&page=1`, {
           headers: {
             Authorization: apiKey,
           },
