@@ -968,7 +968,6 @@ function HomePage({ user, annoyances, exitTrapVisible }) {
       <div className="welcome-section">
         <h2 className="rainbow-text">rainbow cool</h2>
         <p>idk what to put here</p>
-        <button type="button" className="trap-button small" onClick={annoyances.reopenBanner}>open cookie banner</button>
       </div>
 
       <InlineAdStrip />
