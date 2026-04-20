@@ -619,7 +619,12 @@ marquee { color: #ffffff; font-weight: bold; }
 
 @media (max-width: 1200px) {
   .floating-ads {
-    display: none;
+    width: 190px;
+    height: calc(100vh - 220px);
+  }
+
+  .floating-ads .fake-ad-box {
+    width: 170px;
   }
 }
 
