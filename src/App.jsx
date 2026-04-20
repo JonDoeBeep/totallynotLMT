@@ -702,7 +702,7 @@ function buildSidePlacements(side) {
   return shuffleArray(baseSlots)
 }
 
-function FakeAdBox({ title, body, variant = '', imageSeed = 'ad', imageAlt = 'Advertisement image', evasiveClose = true, style, mediaType = 'image', videoData = null }) {
+function FakeAdBox({ title, body, variant = '', imageSeed = 'ad', imageAlt = 'Advertisement image', evasiveClose = true, style, mediaType = 'image', videoData = null, className = '' }) {
   const [stage, setStage] = useState(0)
   const [dismissed, setDismissed] = useState(false)
   const imageToken = useMemo(() => `${imageSeed}-${Math.random().toString(36).slice(2, 10)}`, [imageSeed])
@@ -722,7 +722,7 @@ function FakeAdBox({ title, body, variant = '', imageSeed = 'ad', imageAlt = 'Ad
   if (dismissed) return null
 
   return (
-    <aside className={`fake-ad-box ${variant}`} style={style}>
+    <aside className={`fake-ad-box ${variant} ${className}`.trim()} style={style}>
       <div className="fake-ad-media">
         {mediaType === 'video' && videoData?.link ? (
           <video className="fake-ad-video" src={videoData.link} poster={videoData.image || undefined} autoPlay muted loop playsInline preload="metadata" />
@@ -775,8 +775,22 @@ function FakeAdBox({ title, body, variant = '', imageSeed = 'ad', imageAlt = 'Ad
 function FloatingAds() {
   const videoAdIndex = useMemo(() => Math.floor(Math.random() * 5), [])
   const pexelsVideo = useRandomPexelsVideo(true)
-  const leftPlacements = useMemo(() => buildSidePlacements('left'), [])
-  const rightPlacements = useMemo(() => buildSidePlacements('right'), [])
+  const leftPlacements = useMemo(() => {
+    const slots = buildSidePlacements('left')
+    return slots.map((slot, index) => ({
+      position: 'fixed',
+      top: index === 0 ? `${170 + Math.floor(Math.random() * 42)}px` : `${Math.max(360, Math.round(window.innerHeight * 0.54)) + Math.floor(Math.random() * 30)}px`,
+      left: slot.left || '0%',
+    }))
+  }, [])
+  const rightPlacements = useMemo(() => {
+    const slots = buildSidePlacements('right')
+    return slots.map((slot, index) => ({
+      position: 'fixed',
+      top: index === 0 ? `${198 + Math.floor(Math.random() * 42)}px` : `${Math.max(395, Math.round(window.innerHeight * 0.58)) + Math.floor(Math.random() * 28)}px`,
+      right: slot.right || '0%',
+    }))
+  }, [])
   const leftAds = useMemo(() => ([
     { title: 'Big News!', body: 'doctors hate this one simple trick', variant: 'compact', imageSeed: 'left-1', imageAlt: 'Random ad image 1', style: leftPlacements[0], mediaType: videoAdIndex === 0 ? 'video' : 'image' },
     { title: '9999 hot singles need you NOW', body: '(donload me.)[https:virus.com', variant: 'compact', imageSeed: 'left-2', imageAlt: 'Random ad image 2', style: leftPlacements[1], mediaType: videoAdIndex === 1 ? 'video' : 'image' },
@@ -789,16 +803,12 @@ function FloatingAds() {
 
   return (
     <>
-      <div className="floating-ads floating-ads-left">
-        {leftAds.map((ad) => (
-          <FakeAdBox key={ad.imageSeed} {...ad} videoData={ad.mediaType === 'video' ? pexelsVideo : null} />
-        ))}
-      </div>
-      <div className="floating-ads floating-ads-right">
-        {rightAds.map((ad) => (
-          <FakeAdBox key={ad.imageSeed} {...ad} videoData={ad.mediaType === 'video' ? pexelsVideo : null} />
-        ))}
-      </div>
+      {leftAds.map((ad) => (
+        <FakeAdBox key={ad.imageSeed} {...ad} className="floating-side-ad" videoData={ad.mediaType === 'video' ? pexelsVideo : null} />
+      ))}
+      {rightAds.map((ad) => (
+        <FakeAdBox key={ad.imageSeed} {...ad} className="floating-side-ad" videoData={ad.mediaType === 'video' ? pexelsVideo : null} />
+      ))}
       <div className="bottom-ad-ribbon">
         <FakeAdBox title="Breaking; your scrolling has value" body="Upgrade to ad-free for just 900000." variant="ribbon" imageSeed="bottom-1" imageAlt="Random ad image 5" evasiveClose={false} mediaType={videoAdIndex === 4 ? 'video' : 'image'} videoData={videoAdIndex === 4 ? pexelsVideo : null} />
       </div>

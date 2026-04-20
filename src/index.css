@@ -338,28 +338,16 @@ marquee { color: #ffffff; font-weight: bold; }
   100% { opacity: 0; transform: translate(-50%, -120%) scale(0.8); }
 }
 
-.floating-ads {
+.floating-side-ad {
   position: fixed;
-  top: 150px;
-  z-index: 9000;
-  width: 250px;
-  height: calc(100vh - 250px);
-  pointer-events: none;
-}
-
-.floating-ads-left { left: 8px; }
-.floating-ads-right { right: 8px; }
-
-.floating-ads .fake-ad-box {
-  position: absolute;
   width: 210px;
   pointer-events: auto;
-  z-index: 1;
+  z-index: 9000;
 }
 
-.floating-ads .fake-ad-box:hover,
-.floating-ads .fake-ad-box:focus-within {
-  z-index: 20;
+.floating-side-ad:hover,
+.floating-side-ad:focus-within {
+  z-index: 9020;
 }
 
 .bottom-ad-ribbon {
@@ -618,12 +606,7 @@ marquee { color: #ffffff; font-weight: bold; }
 }
 
 @media (max-width: 1200px) {
-  .floating-ads {
-    width: 190px;
-    height: calc(100vh - 220px);
-  }
-
-  .floating-ads .fake-ad-box {
+  .floating-side-ad {
     width: 170px;
   }
 }
